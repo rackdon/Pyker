@@ -1,3 +1,22 @@
+face_number = {'As': 1,
+               'Dos': 2,
+               'Tres': 3,
+               'Cuatro': 4,
+               'Cinco': 5,
+               'Seis': 6,
+               'Siete': 7,
+               'Ocho': 8,
+               'Nueve': 9,
+               'Diez': 10,
+               'Jota': 11,
+               'Reina': 12,
+               'Rey': 13}
+
+face_of_the_number = ['', 'As', 'Dos', 'Tres', 'Cuatro', 'Cinco', 'Seis',
+                      'Siete', 'Ocho', 'Nueve', 'Diez', 'Jota', 'Reina', 'Rey',
+                      'As']
+
+
 class Hand:
     def __init__(self, hand):
         self.hand = hand
@@ -7,50 +26,60 @@ class Hand:
 
     def print_hand(self):
         for card in self.hand:
-           print card.toString()
+            print(card.to_string())
+
+    def add_card_to_hand(self, card):
+        self.hand.append(card)
+        self.numbers_in_hand.append(self.get_face_number(card.face))
+        self.order_hand()
 
     def determinate_hand(self):
         result = ''
         option = 1
-
         while option <= 8 and result == '':
             result = self.get_result(option)
             option += 1
         return result
 
-    def get_result (self, option):
+    def get_result(self, option):
         result = ''
 
         if option == 1:
-            if self.have_full():
-                result = 'Full'
+            full = self.have_full()
+            if isinstance(full, tuple):
+                result = 'Full with Three of ' + self.get_face(full[0]) \
+                    + ' and Pair of ' + self.get_face(full[1])
 
         if option == 2:
             number_of_card = self.have_straight()
             if number_of_card != 0:
-                result = 'Stright from ' + self.get_face(number_of_card - 4) + ' to '
-                + self.get_face(number_of_card)
+                result = 'Straight from ' + self.get_face(number_of_card - 4) \
+                    + ' to ' + self.get_face(number_of_card)
 
         if option == 3:
-            if self.have_flush():
-                result = 'Flush'
+            flush = self.have_flush()
+            if flush:
+                result = 'Flush of ' + flush
 
         if option == 4:
-            number_of_card = self.have_four()
+            number_of_card = self.have_group(4)
             if number_of_card != 0:
                 result = 'Four of ' + self.get_face(number_of_card)
 
         if option == 5:
-            number_of_card = self.have_three()
+            number_of_card = self.have_group(3)
             if number_of_card != 0:
                 result = 'Three of ' + self.get_face(number_of_card)
 
         if option == 6:
-            if self.have_double_pair():
-                result = 'Double Pair'
+            pairs = self.have_double_pair()
+            if isinstance(pairs, tuple):
+                result = 'Double Pair with ' + self.get_face(pairs[0]) \
+                    + ' and ' \
+                    + self.get_face(pairs[1])
 
         if option == 7:
-            number_of_card = self.have_pair()
+            number_of_card = self.have_group(2)
             if number_of_card != 0:
                 result = 'Pair of ' + self.get_face(number_of_card)
 
@@ -60,137 +89,66 @@ class Hand:
 
         return result
 
-    def order_hand (self):
-        for i in range(0, len(self.numbers_in_hand)-2):
-            for j in range(0, len(self.numbers_in_hand)-1):
-                if self.numbers_in_hand[j] > self.numbers_in_hand[j + 1]:
-                    self.numbers_in_hand[j + 1], self.numbers_in_hand[j] = self.numbers_in_hand[j], self.numbers_in_hand[j + 1]
-                    self.hand[j + 1], self.hand[j] = self.hand[j], self.hand[j + 1]
+    def order_hand(self):
+        self.numbers_in_hand.sort()
+        self.hand = sorted(self.hand,
+                           key=lambda card: self.get_face_number(card.face))
 
     def get_face_number(self, face):
-        if face == 'As':
-            number = 14
-        if face == 'Dos':
-            number = 2
-        if face == 'Tres':
-            number = 3
-        if face == 'Cuatro':
-            number = 4
-        if face == 'Cinco':
-            number = 5
-        if face == 'Seis':
-            number = 6
-        if face == 'Siete':
-            number = 7
-        if face == 'Ocho':
-            number = 8
-        if face == 'Nueve':
-            number = 9
-        if face == 'Diez':
-            number = 10
-        if face == 'Jota':
-            number = 11
-        if face == 'Reina':
-            number = 12
-        if face == 'Rey':
-            number = 13
-
-        return number
+        return face_number.get(face)
 
     def get_face(self, number):
-        if number == 14:
-            face = 'As'
-        if number == 2:
-            face = 'Dos'
-        if number == 3:
-            face = 'Tres'
-        if number == 4:
-            face = 'Cuatro'
-        if number == 5:
-            face = 'Cinco'
-        if number == 6:
-            face = 'Seis'
-        if number == 7:
-            face = 'Siete'
-        if number == 8:
-            face = 'Ocho'
-        if number == 9:
-            face = 'Nueve'
-        if number == 10:
-            face = 'Diez'
-        if number == 11:
-            face = 'Jota'
-        if number == 12:
-            face = 'Reina'
-        if number == 13:
-            face = 'Rey'
-
-        return face
+        return face_of_the_number[number]
 
     def get_numbers_in_hand(self):
         for i in range(0, len(self.hand)):
-            self.numbers_in_hand.append(self.get_face_number(self.hand[i].face))
+            self.numbers_in_hand.append(
+                self.get_face_number(self.hand[i].face))
 
     def have_full(self):
-        number_of_three = self.have_three()
-        return number_of_three != 0 and self.have_pair(number_of_three) != 0
+        number_of_three = self.have_group(3)
+        number_of_pair = self.have_group(2, number_of_three)
+        return (number_of_three, number_of_pair) if number_of_three != 0 and \
+            number_of_pair != 0 else 0
 
     def have_straight(self):
-        for hand_position in range(0, len(self.numbers_in_hand)-2):
-            if self.numbers_in_hand[hand_position] + 1 != self.numbers_in_hand[hand_position+1]:
-                    return 0
-        return self.numbers_in_hand[len(self.numbers_in_hand)-1]
+        non_repeated_numbers = []
+        higher_straight_number = 0
+        for number in self.numbers_in_hand:
+            if number not in non_repeated_numbers:
+                non_repeated_numbers.insert(number+1, number)
+        if non_repeated_numbers[0] == 1 and non_repeated_numbers[-1] == 13:
+            non_repeated_numbers.append(14)
+        for section in range(len(non_repeated_numbers)-4):
+            if non_repeated_numbers[section+4] == \
+               non_repeated_numbers[section]+4:
+                higher_straight_number = non_repeated_numbers[section] + 4
+        return higher_straight_number
 
     def have_flush(self):
-        for current_card in range(1, len(self.hand)):
-            if self.hand[0].suit != self.hand[current_card].suit:
-                return False
-        return True
-
-    def have_four(self):
-        number_of_coincidences = 1
-        pdb.set_trace()
-        for current_card in range(0,len(self.numbers_in_hand)-3):
-            if number_of_coincidences == 4:
-                break
-            number_of_coincidences = 1
-            for sample_card in range(current_card+1, len(self.numbers_in_hand)):
-                if self.numbers_in_hand[current_card] == self.numbers_in_hand[sample_card]:
-                        number_of_coincidences += 1
-                        number = self.numbers_in_hand[current_card]
-
-        return number if number_of_coincidences == 4 else 0
-
-    def have_three(self):
-        number_of_coincidences = 1
-        for current_card in range(0,len(self.numbers_in_hand)-2):
-            if number_of_coincidences == 3:
-                break
-            number_of_coincidences = 1
-            for sample_card in range(current_card+1, len(self.numbers_in_hand)):
-                if self.numbers_in_hand[current_card] == self.numbers_in_hand[sample_card]:
-                        number_of_coincidences += 1
-                        number = self.numbers_in_hand[current_card]
-
-        return number if number_of_coincidences == 3 else 0
+        suit_hand = [current_card.suit for current_card in self.hand]
+        for current_suit in suit_hand:
+            if suit_hand.count(current_suit) == 5:
+                return current_suit
+        return False
 
     def have_double_pair(self):
-        number = self.have_pair()
-        return number != 0 and self.have_pair(number) != 0
+        pair1 = self.have_group(2)
+        pair2 = self.have_group(2, pair1)
+        return (pair1, pair2) if pair1 != 0 and pair2 != 0 else 0
 
-    def have_pair (self, used_number=0):
-        for current_card in range(0, len(self.numbers_in_hand)-1):
-            if self.numbers_in_hand[current_card] == used_number:
-                break
-            for sample_card in range(current_card+1, len(self.numbers_in_hand)):
-                if self.numbers_in_hand[current_card] == self.numbers_in_hand[sample_card]:
-                        return self.numbers_in_hand[current_card]
-        return 0
+    def have_group(self, kind_of_group, used_number=0):
+        group = 0
+        for number in self.numbers_in_hand:
+            if self.numbers_in_hand.count(number) == kind_of_group \
+               and number != used_number \
+               and group != 1:
+                    group = number
+        return group
 
     def have_higher_card(self):
         number = 0
         for card in self.numbers_in_hand:
-            if card > number:
+            if (card > number or card == 1) and number != 1:
                 number = card
-
         return number
