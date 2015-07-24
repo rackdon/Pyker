@@ -1,3 +1,6 @@
+from operator import itemgetter
+from itertools import groupby
+
 face_number = {'As': 1,
                'Dos': 2,
                'Tres': 3,
@@ -34,58 +37,67 @@ class Hand:
         self.order_hand()
 
     def determinate_hand(self):
-        result = ''
+        result = []
         option = 1
-        while option <= 8 and result == '':
+        while option <= 8 and len(result) <= 1:
             result = self.get_result(option)
             option += 1
         return result
 
     def get_result(self, option):
-        result = ''
+        result = [option]
 
         if option == 1:
             full = self.have_full()
-            if isinstance(full, tuple):
-                result = 'Full with Three of ' + self.get_face(full[0]) \
-                    + ' and Pair of ' + self.get_face(full[1])
+            if isinstance(full, list):
+                result.append(full)
+                result.append('Full with Three of ' + self.get_face(full[0])
+                              + ' and Pair of ' + self.get_face(full[1]))
 
         if option == 2:
             number_of_card = self.have_straight()
             if number_of_card != 0:
-                result = 'Straight from ' + self.get_face(number_of_card - 4) \
-                    + ' to ' + self.get_face(number_of_card)
+                result.append([number_of_card])
+                result.append('Straight from '
+                              + self.get_face(number_of_card - 4)
+                              + ' to ' + self.get_face(number_of_card))
 
         if option == 3:
             flush = self.have_flush()
             if flush:
-                result = 'Flush of ' + flush
+                result.append([])
+                result.append('Flush of ' + flush)
 
         if option == 4:
             number_of_card = self.have_group(4)
             if number_of_card != 0:
-                result = 'Four of ' + self.get_face(number_of_card)
+                result.append([number_of_card])
+                result.append('Four of ' + self.get_face(number_of_card))
 
         if option == 5:
             number_of_card = self.have_group(3)
             if number_of_card != 0:
-                result = 'Three of ' + self.get_face(number_of_card)
+                result.append([number_of_card])
+                result.append('Three of ' + self.get_face(number_of_card))
 
         if option == 6:
             pairs = self.have_double_pair()
-            if isinstance(pairs, tuple):
-                result = 'Double Pair with ' + self.get_face(pairs[0]) \
-                    + ' and ' \
-                    + self.get_face(pairs[1])
+            if isinstance(pairs, list):
+                result.append(pairs)
+                result.append('Double Pair with ' + self.get_face(pairs[0])
+                              + ' and '
+                              + self.get_face(pairs[1]))
 
         if option == 7:
             number_of_card = self.have_group(2)
             if number_of_card != 0:
-                result = 'Pair of ' + self.get_face(number_of_card)
+                result.append([number_of_card])
+                result.append('Pair of ' + self.get_face(number_of_card))
 
         if option == 8:
             number_of_card = self.have_higher_card()
-            result = 'Higher Card with ' + self.get_face(number_of_card)
+            result.append([number_of_card])
+            result.append('Higher Card with ' + self.get_face(number_of_card))
 
         return result
 
@@ -108,34 +120,35 @@ class Hand:
     def have_full(self):
         number_of_three = self.have_group(3)
         number_of_pair = self.have_group(2, number_of_three)
-        return (number_of_three, number_of_pair) if number_of_three != 0 and \
+        return [number_of_three, number_of_pair] if number_of_three != 0 and \
             number_of_pair != 0 else 0
 
     def have_straight(self):
-        non_repeated_numbers = []
-        higher_straight_number = 0
-        for number in self.numbers_in_hand:
-            if number not in non_repeated_numbers:
-                non_repeated_numbers.insert(number+1, number)
+        for key, group in groupby(enumerate(
+                                  self.get_non_repeated_numbers_list()),
+                                  lambda (index, item): index - item):
+            group = map(itemgetter(1), group)
+            if len(group) > 5:
+                return group[-1]
+        return 0
+
+    def get_non_repeated_numbers_list(self):
+        non_repeated_numbers = list(set(self.numbers_in_hand))
         if non_repeated_numbers[0] == 1 and non_repeated_numbers[-1] == 13:
             non_repeated_numbers.append(14)
-        for section in range(len(non_repeated_numbers)-4):
-            if non_repeated_numbers[section+4] == \
-               non_repeated_numbers[section]+4:
-                higher_straight_number = non_repeated_numbers[section] + 4
-        return higher_straight_number
+        return non_repeated_numbers
 
     def have_flush(self):
         suit_hand = [current_card.suit for current_card in self.hand]
         for current_suit in suit_hand:
-            if suit_hand.count(current_suit) == 5:
+            if suit_hand.count(current_suit) >= 5:
                 return current_suit
         return False
 
     def have_double_pair(self):
         pair1 = self.have_group(2)
         pair2 = self.have_group(2, pair1)
-        return (pair1, pair2) if pair1 != 0 and pair2 != 0 else 0
+        return [pair1, pair2] if pair1 != 0 and pair2 != 0 else 0
 
     def have_group(self, kind_of_group, used_number=0):
         group = 0

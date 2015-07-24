@@ -23,5 +23,7 @@ if __name__ == '__main__':
     while game.round_number < 6:
         for player in game.players.players.itervalues():
             player.print_hand()
-            print player.get_result_of_hand(), '\n'
+            print 
+        print game.players.who_wins()
+        print
         game.next_round()

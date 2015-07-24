@@ -1,9 +1,10 @@
+# coding=UTF-8
 import unittest
 
-from classes.player import Player
-from classes.deck_of_cards import Deck_of_cards
-from classes.card import Card
-from classes.hand import Hand
+from ..classes.player import Player
+from ..classes.deck_of_cards import Deck_of_cards
+from ..classes.card import Card
+from ..classes.hand import Hand
 
 
 class Player_test(unittest.TestCase):
@@ -20,7 +21,7 @@ class Player_test(unittest.TestCase):
         player = Player(Deck_of_cards(), 'Pepe')
         player.hand = Hand(mock_hand)
         self.assertEqual(player.get_result_of_hand(),
-                         'Pepe has Four of As')
+                         [4, [1], 'Four of As', 'Pepe'])
 
 if __name__ == '__main__':
     unittest.main()

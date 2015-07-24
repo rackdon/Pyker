@@ -7,8 +7,9 @@ class Player:
         self.player_name = name
 
     def get_result_of_hand(self):
-        return '%s has %s' % \
-               (self.player_name, self.hand.determinate_hand())
+        result = self.hand.determinate_hand()
+        result.append(self.player_name)
+        return result
 
     def print_hand(self):
         self.hand.print_hand()

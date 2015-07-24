@@ -1,8 +1,8 @@
 import unittest
 import copy
 
-from classes.deck_of_cards import Deck_of_cards
-from classes.card import Card
+from ..classes.deck_of_cards import Deck_of_cards
+from ..classes.card import Card
 
 
 class Deck_of_cards_test(unittest.TestCase):
@@ -30,12 +30,6 @@ class Deck_of_cards_test(unittest.TestCase):
     def test_deal_card(self):
         deck_of_cards = Deck_of_cards()
         self.assertIsInstance(deck_of_cards.deal_card(), Card)
-
-    def test_deal_card_out_of_range(self):
-        deck_of_cards = Deck_of_cards()
-        deck_of_cards.current_card = 52
-        self.assertNotIsInstance(deck_of_cards.deal_card(), Card)
-
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,13 +1,13 @@
 import unittest
 
-from classes.card import Card
+from ..classes.card import Card
 
 
 class Card_test(unittest.TestCase):
 
     def test_passed_one_card_create_a_string(self):
         card = Card('Cuatro', 'Picas')
-        self.assertEqual(card.toString(), 'Cuatro of Picas')
+        self.assertEqual(card.to_string(), 'Cuatro of Picas')
 
     def test_face_assignment(self):
         card = Card('As', 'Corazones')
