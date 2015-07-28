@@ -10,7 +10,7 @@ from ..classes.hand import Hand
 class Player_test(unittest.TestCase):
     def test_self_hand(self):
         player = Player(Deck_of_cards(), 'Pepe')
-        self.assertEqual(len(player.hand.hand), 5)
+        self.assertEqual(len(player.hand.hand), 2)
 
     def test_get_result_of_hand(self):
         mock_hand = [Card('As', 'Corazones'),

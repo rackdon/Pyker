@@ -89,7 +89,8 @@ class Players_test(unittest.TestCase):
         player1.hand = Hand(player1_hand)
         player2 = players.players.get('Juan')
         player2.hand = Hand(player2_hand)
-        self.assertEqual(players.who_wins(), 'There is a draw')
+        self.assertEqual(players.who_wins(),
+                         'There is a draw between Pepe Juan with Pair of Rey')
 
     def test_who_wins_with_compound_hand_draw(self):
         player1_hand = [Card('Rey', 'Diamantes'),
@@ -111,6 +112,33 @@ class Players_test(unittest.TestCase):
         player1.hand = Hand(player1_hand)
         player2 = players.players.get('Juan')
         player2.hand = Hand(player2_hand)
-        self.assertEqual(players.who_wins(), 'There is a draw')
+        self.assertEqual(players.who_wins(), 'There is a draw between Juan '
+                         + 'Pepe with Double Pair with Rey and Dos')
+
+    def test_who_wins_with_simple_hand_flush(self):
+        player1_hand = [Card('Cuatro', 'Corazones'),
+                        Card('Cinco', 'Corazones'),
+                        Card('Seis', 'Corazones'),
+                        Card('Siete', 'Tréboles'),
+                        Card('Siete', 'Corazones'),
+                        Card('Rey', 'Corazones')]
+
+        player2_hand = [Card('Cuatro', 'Corazones'),
+                        Card('Seis', 'Corazones'),
+                        Card('Siete', 'Tréboles'),
+                        Card('Siete', 'Corazones'),
+                        Card('Diez', 'Picas'),
+                        Card('Reina', 'Tréboles')]
+
+        players = Players(Deck_of_cards())
+        players.add_player('Pepe')
+        players.add_player('Juan')
+        player1 = players.players.get('Pepe')
+        player1.hand = Hand(player1_hand)
+        player2 = players.players.get('Juan')
+        player2.hand = Hand(player2_hand)
+        self.assertEqual(players.who_wins(),
+                         'Pepe wins with Flush of Corazones')
+
 if __name__ == '__main__':
     unittest.main()

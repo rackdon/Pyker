@@ -20,7 +20,7 @@ class Deck_of_cards:
                 self.deck[second], self.deck[position]
 
     def deal_hand(self):
-        hand = [self.deal_card() for i in range(5)]
+        hand = [self.deal_card() for i in range(2)]
         return hand
 
     def deal_card(self):

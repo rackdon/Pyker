@@ -25,7 +25,7 @@ class Deck_of_cards_test(unittest.TestCase):
 
     def test_deal_hand(self):
         deck_of_cards = Deck_of_cards()
-        self.assertEqual(len(deck_of_cards.deal_hand()), 5)
+        self.assertEqual(len(deck_of_cards.deal_hand()), 2)
 
     def test_deal_card(self):
         deck_of_cards = Deck_of_cards()
